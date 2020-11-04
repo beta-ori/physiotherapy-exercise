@@ -1,336 +1,278 @@
-/***  Left side bar***/
-
-import React, { useState, useEffect } from 'react'
-import {Collapse} from 'reactstrap'
-import './Sidebar.css'
-import { BsCaretDown, BsSearch, BsCaretRight } from 'react-icons/bs'
+import React, { useState, useEffect, useContext } from 'react';
+import { Collapse } from 'reactstrap';
+import './Sidebar.css';
+import { BsCaretDown, BsSearch, BsCaretRight } from 'react-icons/bs';
+import axios from 'axios';
+import StoreContext from '../store/StoreContext';
 
 
 function Sidebar() {
 
-    const [isOpen, setIsOpen] = useState({})
-    const [condition, setCondition] = useState('')
-    const [ageCategory, setAgeCategory] = useState('')
-    const [difficulty, setDifficulty] = useState(new Array(3).fill(''))
-    const [imageOrientation, setImageOrientation] = useState('')
+    const initialActiveStatus = {
+        search: false,
+        condition: false,
+        ageCategory: false,
+        difficulty: false,
+        imageOrientation: false,
+        equipment: false,
+        exerciseType: false,
+        bodyPart: false
+    };
+
+    const [activeStatus, setActiveStatus] = useState(initialActiveStatus);
+
+    const [exerciseProperties, setExerciseProperties] = useState({
+        condition: '',
+        ageCategory: '',
+        difficulty: [],
+        imageOrientation: '',
+        equipment: [],
+        exerciseType: [],
+        bodyPart: []
+    });
+
+    const [filteredImages, setFilteredImages] = useContext(StoreContext);
+
+    useEffect(() => {
+        setFilteredImages(exerciseProperties);
+    }, [exerciseProperties]);
 
 
-    const handleDifficultyArr = (e, index) => {
-        let arr = [...difficulty]
+    const onClickUpdateDifficulty = (e) => {
+        let arr = [...exerciseProperties.difficulty];
 
-        console.log(arr)
-        if(arr[index] != '')
-            arr[index] = e.target.value 
-        else 
-            arr[index] = ''
-        
-        setDifficulty(arr)
+        if (e.target.checked)
+            arr.push(e.target.value);
+        else {
+            let index = arr.indexOf(e.target.value);
+            arr.splice(index, 1);
+        }
 
-        console.log(arr)
+        setExerciseProperties({ ...exerciseProperties, difficulty: arr });
     }
-        
-    useEffect( () => {
-        console.log(condition)
-        console.log(ageCategory)
-        console.log(difficulty)
-    }, [condition, ageCategory])
+
+    const onClickUpdateEquipment = (e) => {
+        let arr = [...exerciseProperties.equipment];
+
+        if (e.target.checked)
+            arr.push(e.target.value);
+        else {
+            let index = arr.indexOf(e.target.value);
+            arr.splice(index, 1);
+        }
+
+        setExerciseProperties({ ...exerciseProperties, equipment: arr });
+    }
+
+
+    const onClickUpdateExerciseType = e => {
+        let arr = [...exerciseProperties.exerciseType];
+
+        if (e.target.checked)
+            arr.push(e.target.value);
+        else {
+            let index = arr.indexOf(e.target.value);
+            arr.splice(index, 1);
+        }
+        setExerciseProperties({ ...exerciseProperties, exerciseType: arr });
+    }
+
+    const onClickUpdateBodyPart = e => {
+        let arr = [...exerciseProperties.bodyPart];
+
+        if (e.target.checked)
+            arr.push(e.target.value);
+        else {
+            let index = arr.indexOf(e.target.value);
+            arr.splice(index, 1);
+        }
+        setExerciseProperties({ ...exerciseProperties, bodyPart: arr });
+    }
 
     return (
         <div className='sidebar-container'>
 
             <div className='search'>
-                <button className={'button '+ (isOpen.searh?'active':'')}
-                    onClick={ e => setIsOpen({searh: isOpen.searh?false: true})}>
+                <button
+                    className={'button ' + (activeStatus.searh ? 'active' : '')}
+                    onClick={e => setActiveStatus({ ...initialActiveStatus, searh: activeStatus.searh ? false : true })}>
                     {
-                        isOpen.searh?
-                        <BsCaretRight />:
-                        <BsCaretDown />    
+                        activeStatus.searh ?
+                            <BsCaretRight /> :
+                            <BsCaretDown />
                     }
                     <span>Search</span>
                 </button>
-                <button className='button-inner'><BsSearch size='12px'/></button>
+                <button className='button-inner'><BsSearch size='12px' /></button>
             </div>
 
-            <Collapse isOpen={isOpen.searh}>
+            <Collapse isOpen={activeStatus.searh}>
                 <div className='search-field'>
-                    <input type='text' name='search' placeholder='Enter keywords here'/>
-                    
+                    <input type='text' name='search' placeholder='Enter keywords here' />
+
                     <ul>
                         {
-                            condition !== ''?
-                            <li>Condition is {condition}</li>:null
+                            exerciseProperties.condition !== '' ?
+                                <li>Condition is {exerciseProperties.condition}</li> : ''
                         }
+
                         {
-                            ageCategory !== ''?
-                            <li>Age category is {ageCategory}</li>:null
+                            exerciseProperties.difficulty.length > 0 ?
+                                <li>Difficulty is {exerciseProperties.difficulty.join(' or ')}</li> : ''
                         }
+
                         {
-                                <li>Difficulty is {difficulty.join(' or ')}</li>
+                            exerciseProperties.equipment.length > 0 ?
+                                <li>Equipment is {exerciseProperties.equipment.join(' or ')}</li> : ''
                         }
+
+                        {
+                            exerciseProperties.exerciseType.length > 0 ?
+                                <li>Exercise type is {exerciseProperties.exerciseType.join(' or ')}</li> : ''
+                        }
+
+                        {
+                            exerciseProperties.bodyPart.length > 0 ?
+                                <li>Body part is {exerciseProperties.bodyPart.join(' or ')}</li> : ''
+                        }
+
+                        {
+                            exerciseProperties.ageCategory !== '' ?
+                                <li>Age category is {exerciseProperties.ageCategory}</li> : ''
+                        }
+
+
+                        {
+                            exerciseProperties.imageOrientation !== '' ?
+                                <li>Image orientation is {exerciseProperties.imageOrientation}</li> : ''
+                        }
+
                     </ul>
                 </div>
             </Collapse>
 
-            
-            <button className={'button '+ (isOpen.condition?'active':'')} 
-                onClick={ e => setIsOpen({condition: isOpen.condition?false: true})}>
+
+            <button
+                className={'button ' + (activeStatus.condition ? 'active' : '')}
+                onClick={e => setActiveStatus({ ...initialActiveStatus, condition: activeStatus.condition ? false : true })}>
                 {
-                    isOpen.condition?
-                    <BsCaretRight />:
-                    <BsCaretDown />    
+                    activeStatus.condition ?
+                        <BsCaretRight /> :
+                        <BsCaretDown />
                 }
                 <span> Condition </span>
             </button>
 
-            <Collapse isOpen={isOpen.condition}>
+            <Collapse isOpen={activeStatus.condition}>
                 <div className='condition-outer'>
                     Spinal Cord Injury
                     <div className='condition-inner'>
                         <div>
-                            <input 
+                            <input
                                 type='radio'
                                 value='C1-C4 Tetraplegia'
                                 name='condition'
-                                onChange={e => setCondition(e.target.value)}
+                                onChange={e => setExerciseProperties({ ...exerciseProperties, condition: e.target.value })}
                             />
                             <label>C1-C4 Tetraplegia</label>
                         </div>
 
 
                         <div>
-                            <input 
+                            <input
                                 type='radio'
                                 value='C5 Tetraplegia'
                                 name='condition'
-                                onChange={e => setCondition(e.target.value)}
+                                onChange={e => setExerciseProperties({ ...exerciseProperties, condition: e.target.value })}
                             />
                             <label>C5 Tetraplegia</label>
                         </div>
 
 
                         <div>
-                            <input 
+                            <input
                                 type='radio'
                                 value='C6 Tetraplegia'
                                 name='condition'
-                                onChange={e => setCondition(e.target.value)}
+                                onChange={e => setExerciseProperties({ ...exerciseProperties, condition: e.target.value })}
                             />
                             <label>C6 Tetraplegia</label>
-                        </div>
-
-
-                        <div>
-                            <input 
-                                type='radio'
-                                value='C7-C8 Tetraplegia'
-                                name='condition'
-                                onChange={e => setCondition(e.target.value)}
-                            />
-                            <label>C7-C8 Tetraplegia</label>
-                        </div>
-
-
-                        <div>
-                            <input 
-                                type='radio'
-                                value='T1-C4 Tetraplegia'
-                                name='condition'
-                                onChange={e => setCondition(e.target.value)}
-                            />
-                            <label>T1-C4 Tetraplegia</label>
-                        </div>
-
-
-                        <div>
-                            <input 
-                                type='radio'
-                                value='L2-S1 Tetraplegia'
-                                name='condition'
-                                onChange={e => setCondition(e.target.value)}
-                            />
-                            <label>L2-S1 Tetraplegia</label>
-                        </div>
-
-
-                        <div>
-                            <input 
-                                type='radio'
-                                value='Motor incomplete SCI'
-                                name='condition'
-                                onChange={e => setCondition(e.target.value)}
-                            />
-                            <label>Motor incomplete SCI</label>
                         </div>
 
                     </div>
 
                     <div>
-                        <input 
+                        <input
                             type='radio'
                             value='Traumatic brain injury'
                             name='condition'
-                            onChange={e => setCondition(e.target.value)}
+                            onChange={e => setExerciseProperties({ ...exerciseProperties, condition: e.target.value })}
                         />
                         <label>Traumatic brain injur</label>
                     </div>
 
 
                     <div>
-                        <input 
+                        <input
                             type='radio'
                             value='Stroke'
                             name='condition'
-                            onChange={e => setCondition(e.target.value)}
+                            onChange={e => setExerciseProperties({ ...exerciseProperties, condition: e.target.value })}
                         />
                         <label>Strok</label>
                     </div>
 
-
                     <div>
-                        <input 
+                        <input
                             type='radio'
                             value='Motor delay'
                             name='condition'
-                            onChange={e => setCondition(e.target.value)}
+                            onChange={e => setExerciseProperties({ ...exerciseProperties, condition: e.target.value })}
                         />
                         <label>Motor dela</label>
                     </div>
 
-
-                    <div>
-                        <input 
-                            type='radio'
-                            value='Aged'
-                            name='condition'
-                            onChange={e => setCondition(e.target.value)}
-                        />
-                        <label>Age</label>
-                    </div>
-
-
-                    <div>
-                        <input 
-                            type='radio'
-                            value='Multiple sclerosis'
-                            name='condition'
-                            onChange={e => setCondition(e.target.value)}
-                        />
-                        <label>Multiple sclerosi</label>
-                    </div>
-
-
-                    <div>
-                        <input 
-                            type='radio'
-                            value='Hand injury'
-                            name='condition'
-                            onChange={e => setCondition(e.target.value)}
-                        />
-                        <label>Hand injur</label>
-                    </div>
-
-
-                    <div>
-                        <input 
-                            type='radio'
-                            value='Whiplash'
-                            name='condition'
-                            onChange={e => setCondition(e.target.value)}
-                        />
-                        <label>Whiplas</label>
-                    </div>
-
-
-                    <div>
-                        <input 
-                            type='radio'
-                            value='Orthopaedic injury'
-                            name='condition'
-                            onChange={e => setCondition(e.target.value)}
-                        />
-                        <label>Orthopaedic injur</label>
-                    </div>
-
-
-                    <div>
-                        <input 
-                            type='radio'
-                            value="Parkinson's disease"
-                            name='condition'
-                            onChange={e => setCondition(e.target.value)}
-                        />
-                        <label>Parkinson's diseas</label>
-                    </div>
-
-
-                    <div>
-                        <input 
-                            type='radio'
-                            value='Burn injures'
-                            name='condition'
-                            onChange={e => setCondition(e.target.value)}
-                        />
-                        <label>Burn injure</label>
-                    </div>
-
-
-                    <div>
-                        <input 
-                            type='radio'
-                            value='Amputation'
-                            name='condition'
-                            onChange={e => setCondition(e.target.value)}
-                        />
-                        <label>Amputation</label>
-                    </div>
-
-
-                    <div>
-                        <input 
-                            type='radio'
-                            value='Osteoarthritis'
-                            name='condition'
-                            onChange={e => setCondition(e.target.value)}
-                        />
-                        <label>Osteoarthriti</label>
-                    </div>
-
-                </div>   
+                </div>
 
             </Collapse>
 
 
-            <button className='button' onClick={ e => setIsOpen({difficulty: isOpen.difficulty?false: true})}>
+            <button
+                className={'button ' + (activeStatus.difficulty ? 'active' : '')}
+                onClick={e => setActiveStatus({ ...initialActiveStatus, difficulty: activeStatus.difficulty ? false : true })}>
                 {
-                    isOpen.difficulty?
-                    <BsCaretRight />:
-                    <BsCaretDown />    
+                    activeStatus.difficulty ?
+                        <BsCaretRight /> :
+                        <BsCaretDown />
                 }
                 <span>Exercise difficulty</span>
             </button>
 
-            <Collapse isOpen={isOpen.difficulty}>
+            <Collapse isOpen={activeStatus.difficulty}>
                 <div className='difficulty'>
                     <label>
-                        <input 
-                            type='checkbox' value='Low' 
-                            onChange={e => handleDifficultyArr(e, 0)}
+                        <input
+                            type='checkbox'
+                            value='Low'
+                            onChange={e => onClickUpdateDifficulty(e)}
                         />
                         Low
                     </label>
 
                     <label>
-                        <input 
-                            type='checkbox' value='Medium' 
-                            onChange={e => handleDifficultyArr(e, 1)}
+                        <input
+                            type='checkbox'
+                            value='Medium'
+                            onChange={e => onClickUpdateDifficulty(e)}
                         />
                         Meduim
                     </label>
 
                     <label>
-                        <input 
-                            type='checkbox' value='High' 
-                            onChange={e => handleDifficultyArr(e, 2)}
+                        <input
+                            type='checkbox'
+                            value='High'
+                            onChange={e => onClickUpdateDifficulty(e)}
                         />
                         High
                     </label>
@@ -339,208 +281,186 @@ function Sidebar() {
 
 
 
-            <button className='button' onClick={ e => setIsOpen({equipment: isOpen.equipment?false: true})}>
+            <button
+                className={'button ' + (activeStatus.equipment ? 'active' : '')}
+                onClick={e => setActiveStatus({ ...initialActiveStatus, equipment: activeStatus.equipment ? false : true })}>
                 {
-                    isOpen.equipment?
-                    <BsCaretRight />:
-                    <BsCaretDown />    
+                    activeStatus.equipment ?
+                        <BsCaretRight /> :
+                        <BsCaretDown />
                 }
                 <span>Equipment available</span>
             </button>
 
-            <Collapse isOpen={isOpen.equipment}>
+            <Collapse isOpen={activeStatus.equipment}>
                 <div className='equipment'>
                     <label>
-                        <input type='checkbox'/>
+                        <input
+                            type='checkbox'
+                            value='Free weights'
+                            onChange={e => onClickUpdateEquipment(e)}
+                        />
                         Free weights
                     </label>
 
                     <label>
-                        <input type='checkbox'/>
+                        <input
+                            type='checkbox'
+                            value='Weight machine'
+                            onChange={e => onClickUpdateEquipment(e)}
+                        />
                         Weight machine
                     </label>
 
                     <label>
-                        <input type='checkbox'/>
+                        <input
+                            type='checkbox'
+                            value='Wall mounted pulleys'
+                            onChange={e => onClickUpdateEquipment(e)}
+                        />
                         Wall mounted pulleys
-                    </label>
-
-                    <label>
-                        <input type='checkbox'/>
-                        Theraband
-                    </label>
-
-                    <label>
-                        <input type='checkbox'/>
-                        Step/block
-                    </label>
-
-                    <label>
-                        <input type='checkbox'/>
-                        Standing equipment
-                    </label>
-
-                    <label>
-                        <input type='checkbox'/>
-                        Spints
                     </label>
 
                 </div>
             </Collapse>
 
 
-            <button className='button' onClick={ e => setIsOpen({exercise: isOpen.exercise?false: true})}>
+            <button
+                className={'button ' + (activeStatus.exerciseType ? 'active' : '')}
+                onClick={e => setActiveStatus({ ...initialActiveStatus, exerciseType: activeStatus.exerciseType ? false : true })}>
                 {
-                    isOpen.exercise?
-                    <BsCaretRight />:
-                    <BsCaretDown />    
+                    activeStatus.exerciseType ?
+                        <BsCaretRight /> :
+                        <BsCaretDown />
                 }
                 <span>Exercise type</span>
             </button>
 
-            <Collapse isOpen={isOpen.exercise}>
+            <Collapse isOpen={activeStatus.exerciseType}>
                 <div className='exercise'>
                     <label>
-                        <input type='checkbox'/>
+                        <input
+                            type='checkbox'
+                            value='Stretching/ROW'
+                            onChange={e => onClickUpdateExerciseType(e)}
+                        />
                         Stretching/ROW
                     </label>
 
                     <label>
-                        <input type='checkbox'/>
+                        <input
+                            type='checkbox'
+                            value='Fitness training'
+                            onChange={e => onClickUpdateExerciseType(e)}
+                        />
                         Fitness training
                     </label>
 
                     <label>
-                        <input type='checkbox'/>
+                        <input
+                            type='checkbox'
+                            value='Control exercises'
+                            onChange={e => onClickUpdateExerciseType(e)}
+                        />
                         Control exercises
-                    </label>
-
-                    <label>
-                        <input type='checkbox'/>
-                        Amplitude exercises
-                    </label>
-
-                    <label>
-                        <input type='checkbox'/>
-                        Clearing secretions
-                    </label>
-
-                    <label>
-                        <input type='checkbox'/>
-                        Manipulating objects
                     </label>
 
                 </div>
             </Collapse>
 
 
-            <button className='button' onClick={ e => setIsOpen({bodyPart: isOpen.bodyPart?false: true})}>
+            <button
+                className={'button ' + (activeStatus.bodyPart ? 'active' : '')}
+                onClick={e => setActiveStatus({ ...initialActiveStatus, bodyPart: activeStatus.bodyPart ? false : true })}>
                 {
-                    isOpen.bodyPart?
-                    <BsCaretRight />:
-                    <BsCaretDown />    
+                    activeStatus.bodyPart ?
+                        <BsCaretRight /> :
+                        <BsCaretDown />
                 }
                 <span>Body part</span>
             </button>
 
-            <Collapse isOpen={isOpen.bodyPart}>
+            <Collapse isOpen={activeStatus.bodyPart}>
                 <div className='body-part'>
                     <label>
-                        <input type='checkbox'/>
+                        <input
+                            type='checkbox'
+                            value='Manipulating objects'
+                            onChange={e => onClickUpdateBodyPart(e)}
+                        />
                         Head/neck
                     </label>
 
                     <label>
-                        <input type='checkbox'/>
+                        <input
+                            type='checkbox'
+                            value='Manipulating objects'
+                            onChange={e => onClickUpdateBodyPart(e)}
+                        />
                         Shoulder/upper arm
                     </label>
 
                     <label>
-                        <input type='checkbox'/>
+                        <input
+                            type='checkbox'
+                            value='Manipulating objects'
+                            onChange={e => onClickUpdateBodyPart(e)}
+                        />
                         Elbow/forearm
-                    </label>
-
-                    <label>
-                        <input type='checkbox'/>
-                        Wrist/hand
-                    </label>
-
-                    <label>
-                        <input type='checkbox'/>
-                        Trunk/back
-                    </label>
-
-                    <label>
-                        <input type='checkbox'/>
-                        Hip/thigh
-                    </label>
-
-                    <label>
-                        <input type='checkbox'/>
-                        Knee/lower leg
-                    </label>
-
-                    <label>
-                        <input type='checkbox'/>
-                        Ankle/foot
-                    </label>
-
-                    <label>
-                        <input type='checkbox'/>
-                        Whole body
                     </label>
 
                 </div>
             </Collapse>
 
-
-            <button className='button' onClick={ e => setIsOpen({ageCategory: isOpen.ageCategory?false: true})}>
+            <button
+                className={'button ' + (activeStatus.ageCategory ? 'active' : '')}
+                onClick={e => setActiveStatus({ ...initialActiveStatus, ageCategory: activeStatus.ageCategory ? false : true })}>
                 {
-                    isOpen.ageCategory?
-                    <BsCaretRight />:
-                    <BsCaretDown />    
+                    activeStatus.ageCategory ?
+                        <BsCaretRight /> :
+                        <BsCaretDown />
                 }
                 <span>Age category</span>
             </button>
 
-            <Collapse isOpen={isOpen.ageCategory}>
+            <Collapse isOpen={activeStatus.ageCategory}>
                 <div className='age-category'>
                     <div>
-                        <input 
+                        <input
                             type='radio'
                             value='Infant/young child'
                             name='ageCategory'
-                            onChange={e => setAgeCategory(e.target.value)}
+                            onChange={e => setExerciseProperties({ ...exerciseProperties, ageCategory: e.target.value })}
                         />
                         <label>Infant/young child</label>
                     </div>
 
                     <div>
-                        <input 
+                        <input
                             type='radio'
                             value='Child'
                             name='ageCategory'
-                            onChange={e => setAgeCategory(e.target.value)}
+                            onChange={e => setExerciseProperties({ ...exerciseProperties, ageCategory: e.target.value })}
                         />
                         <label>Child</label>
                     </div>
 
                     <div>
-                        <input 
+                        <input
                             type='radio'
                             value='Adult'
                             name='ageCategory'
-                            onChange={e => setAgeCategory(e.target.value)}
+                            onChange={e => setExerciseProperties({ ...exerciseProperties, ageCategory: e.target.value })}
                         />
                         <label>Adult</label>
                     </div>
 
                     <div>
-                        <input 
+                        <input
                             type='radio'
                             value='Senior'
                             name='ageCategory'
-                            onChange={e => setAgeCategory(e.target.value)}
+                            onChange={e => setExerciseProperties({ ...exerciseProperties, ageCategory: e.target.value })}
                         />
                         <label>Senior</label>
                     </div>
@@ -549,89 +469,93 @@ function Sidebar() {
             </Collapse>
 
 
-            <button className='button' onClick={ e => setIsOpen({imageOrientation: isOpen.imageOrientation?false: true})}>
-            {
-                    isOpen.imageOrientation?
-                    <BsCaretRight />:
-                    <BsCaretDown />    
+            <button
+                className={'button ' + (activeStatus.imageOrientation ? 'active' : '')}
+                onClick={e => setActiveStatus({ ...initialActiveStatus, imageOrientation: activeStatus.imageOrientation ? false : true })}>
+                {
+                    activeStatus.imageOrientation ?
+                        <BsCaretRight /> :
+                        <BsCaretDown />
                 }
                 <span>Image orientation</span>
             </button>
 
-            <Collapse isOpen={isOpen.imageOrientation}>
+            <Collapse isOpen={activeStatus.imageOrientation}>
                 <div className='image-orientation'>
                     <div>
-                        <input 
+                        <input
                             type='radio'
                             value='Not specified'
                             name='image-orientation'
-                            onChange={e => setImageOrientation(e.target.value)}
+                            onChange={e => setExerciseProperties({ ...exerciseProperties, imageOrientation: e.target.value })}
                         />
                         <label>Not specified</label>
                     </div>
 
                     <div>
-                        <input 
+                        <input
                             type='radio'
                             value='Left specified'
                             name='image-orientation'
-                            onChange={e => setImageOrientation(e.target.value)}
+                            onChange={e => setExerciseProperties({ ...exerciseProperties, imageOrientation: e.target.value })}
                         />
                         <label>Left specified</label>
                     </div>
 
                     <div>
-                        <input 
+                        <input
                             type='radio'
                             value='Right specified'
                             name='image-orientation'
-                            onChange={e => setImageOrientation(e.target.value)}
+                            onChange={e => setExerciseProperties({ ...exerciseProperties, imageOrientation: e.target.value })}
                         />
                         <label>Right specified</label>
                     </div>
-                    
+
                 </div>
             </Collapse>
 
 
-            <button className='button' onClick={ e => setIsOpen({exerciseImage: isOpen.exerciseImage?false: true})}>
+            <button
+                className={'button ' + (activeStatus.exerciseImage ? 'active' : '')}
+                onClick={e => setActiveStatus({ ...initialActiveStatus, exerciseImage: activeStatus.exerciseImage ? false : true })}>
                 {
-                    isOpen.exerciseImage?
-                    <BsCaretRight />:
-                    <BsCaretDown />    
+                    activeStatus.exerciseImage ?
+                        <BsCaretRight /> :
+                        <BsCaretDown />
                 }
-                <span>Select text to display with exercise images</span>
+                <span>Update text to display with exercise images</span>
             </button>
 
-            <Collapse isOpen={isOpen.exerciseImage}>
+            <Collapse isOpen={activeStatus.exerciseImage}>
                 <div className='exercise-image'>
                     <label>
-                        <input type='checkbox'/>
+                        <input type='checkbox' />
                         Therapist`s aim
                     </label>
 
                     <label>
-                        <input type='checkbox'/>
+                        <input type='checkbox' />
                         Client`s aim
                     </label>
 
                     <label>
-                        <input type='checkbox'/>
+                        <input type='checkbox' />
                         Therapist`s intructions
                     </label>
 
                     <label>
-                        <input type='checkbox'/>
+                        <input type='checkbox' />
                         Client`s intructions
                     </label>
 
                     <label>
-                        <input type='checkbox'/>
+                        <input type='checkbox' />
                         Progressions and variations
                     </label>
 
                     <label>
-                        <input type='checkbox'/>
+                        <input type='checkbox' />
                         Precoutions
                     </label>
                 </div>
@@ -641,4 +565,4 @@ function Sidebar() {
     )
 }
 
-export default Sidebar
+export default Sidebar;
