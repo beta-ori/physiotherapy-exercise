@@ -1,6 +1,7 @@
 import './App.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Home from './components/Home';
+import Navbar from './components/navbar/Navbar';
 import StoreContext from './components/store/StoreContext';
 
 function App() {
@@ -16,13 +17,10 @@ function App() {
       bodyPart: []
   });
 
-  useEffect(() => {
-    console.log(selectedExerciseProp);
-  }, [selectedExerciseProp]);
-
   return (
     <>
       <StoreContext.Provider value={[selectedExerciseProp, setSelectedExerciseProp]}>
+        <Navbar />
         <Home />
       </StoreContext.Provider>
     </>

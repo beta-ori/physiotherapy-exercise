@@ -45,7 +45,7 @@ function FilteredImage() {
                                     <img 
                                         src={process.env.PUBLIC_URL + 'assets/images/' + value.imageUrl} 
                                         style={{ width: '100%', height: '100px' }} 
-                                    />
+                                     />
                                     <img 
                                         className={'check-mark ' + (value.isSelected?'selected':'')}
                                         src={process.env.PUBLIC_URL + 'assets/images/check-mark.png'} 

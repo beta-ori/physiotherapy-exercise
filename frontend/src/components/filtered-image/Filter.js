@@ -9,16 +9,16 @@ export const filterExerciseProperties = (exercisePropertiesData, filterPropertie
             flag = flag && value.title.search(filterProperties.searchText) > -1;
     
         if(filterProperties.condition !== '')
-            flag = flag && filterProperties.condition == value.condition;
+            flag = flag && filterProperties.condition === value.condition;
 
         if(filterProperties.ageCategory !== '')
-            flag = flag && filterProperties.ageCategory == value.ageCategory;
+            flag = flag && filterProperties.ageCategory === value.ageCategory;
         
         if(filterProperties.difficulty.length > 0)
             flag = flag && filterProperties.difficulty.includes(value.difficulty);
 
         if(filterProperties.imageOrientaion !== '')
-            flag = flag && filterProperties.imageOrientaion == value.imageOrientaion;
+            flag = flag && filterProperties.imageOrientaion === value.imageOrientaion;
 
         if(filterProperties.equipment.length > 0)
             flag = flag && filterProperties.equipment.includes(value.equipment);

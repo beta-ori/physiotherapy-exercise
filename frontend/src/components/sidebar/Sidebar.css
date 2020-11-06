@@ -57,7 +57,7 @@ input[type='radio']{
     margin-right: 7px;
 }
 
-ul{
+.search-field ul{
     padding-top: 10px;
     padding-left: 20px;
 }
