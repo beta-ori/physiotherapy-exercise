@@ -21,6 +21,6 @@
     opacity: 0.3;
 }
 
-.check-mark:active{
-    opacity: 1;
+.selected{
+    opacity: 1 !important;
 }

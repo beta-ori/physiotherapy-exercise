@@ -6,16 +6,13 @@ import FilteredImage from './filtered-image/FilteredImage';
 function Home() {
 
   return (
-      <div>
-        <Row style={{width: '100%', marginTop: '10px'}}>
-          <Col sm='2'>
-            <Sidebar />
-          </Col>
-
-          <Col sm='8'>
+      <div style={{display: 'grid', gridTemplateColumns: '300px auto'}}>
+          <div style={{float: 'left', width: '250px'}}>
+            <Sidebar/>
+          </div>
+          <div style={{float: 'left'}}>
             <FilteredImage />
-          </Col>
-        </Row>
+          </div>
       </div>
   )
 }

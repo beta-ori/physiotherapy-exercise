@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { Collapse } from 'reactstrap';
 import './Sidebar.css';
 import { BsCaretDown, BsSearch, BsCaretRight } from 'react-icons/bs';
-import axios from 'axios';
 import StoreContext from '../store/StoreContext';
 
 
@@ -21,25 +20,10 @@ function Sidebar() {
 
     const [activeStatus, setActiveStatus] = useState(initialActiveStatus);
 
-    const [exerciseProperties, setExerciseProperties] = useState({
-        condition: '',
-        ageCategory: '',
-        difficulty: [],
-        imageOrientation: '',
-        equipment: [],
-        exerciseType: [],
-        bodyPart: []
-    });
-
-    const [filteredImages, setFilteredImages] = useContext(StoreContext);
-
-    useEffect(() => {
-        setFilteredImages(exerciseProperties);
-    }, [exerciseProperties]);
-
+    const [selectedExerciseProp, setSelectedExerciseProp] = useContext(StoreContext);
 
     const onClickUpdateDifficulty = (e) => {
-        let arr = [...exerciseProperties.difficulty];
+        let arr = [...selectedExerciseProp.difficulty];
 
         if (e.target.checked)
             arr.push(e.target.value);
@@ -48,11 +32,11 @@ function Sidebar() {
             arr.splice(index, 1);
         }
 
-        setExerciseProperties({ ...exerciseProperties, difficulty: arr });
+        setSelectedExerciseProp({ ...selectedExerciseProp, difficulty: arr });
     }
 
     const onClickUpdateEquipment = (e) => {
-        let arr = [...exerciseProperties.equipment];
+        let arr = [...selectedExerciseProp.equipment];
 
         if (e.target.checked)
             arr.push(e.target.value);
@@ -61,12 +45,12 @@ function Sidebar() {
             arr.splice(index, 1);
         }
 
-        setExerciseProperties({ ...exerciseProperties, equipment: arr });
+        setSelectedExerciseProp({ ...selectedExerciseProp, equipment: arr });
     }
 
 
     const onClickUpdateExerciseType = e => {
-        let arr = [...exerciseProperties.exerciseType];
+        let arr = [...selectedExerciseProp.exerciseType];
 
         if (e.target.checked)
             arr.push(e.target.value);
@@ -74,11 +58,11 @@ function Sidebar() {
             let index = arr.indexOf(e.target.value);
             arr.splice(index, 1);
         }
-        setExerciseProperties({ ...exerciseProperties, exerciseType: arr });
+        setSelectedExerciseProp({ ...selectedExerciseProp, exerciseType: arr });
     }
 
     const onClickUpdateBodyPart = e => {
-        let arr = [...exerciseProperties.bodyPart];
+        let arr = [...selectedExerciseProp.bodyPart];
 
         if (e.target.checked)
             arr.push(e.target.value);
@@ -86,7 +70,7 @@ function Sidebar() {
             let index = arr.indexOf(e.target.value);
             arr.splice(index, 1);
         }
-        setExerciseProperties({ ...exerciseProperties, bodyPart: arr });
+        setSelectedExerciseProp({ ...selectedExerciseProp, bodyPart: arr });
     }
 
     return (
@@ -108,43 +92,54 @@ function Sidebar() {
 
             <Collapse isOpen={activeStatus.searh}>
                 <div className='search-field'>
-                    <input type='text' name='search' placeholder='Enter keywords here' />
+                    <input 
+                        type='text' 
+                        name='search'
+                        value={selectedExerciseProp.searchText}
+                        placeholder='Enter keywords here'
+                        onChange={e => setSelectedExerciseProp({...selectedExerciseProp, searchText: e.target.value})}
+                    />
 
                     <ul>
                         {
-                            exerciseProperties.condition !== '' ?
-                                <li>Condition is {exerciseProperties.condition}</li> : ''
+                            selectedExerciseProp.searchText !== '' ?
+                                <li>Search text is {selectedExerciseProp.searchText}</li> : ''
                         }
 
                         {
-                            exerciseProperties.difficulty.length > 0 ?
-                                <li>Difficulty is {exerciseProperties.difficulty.join(' or ')}</li> : ''
+                            selectedExerciseProp.condition !== '' ?
+                                <li>Condition is {selectedExerciseProp.condition}</li> : ''
                         }
 
                         {
-                            exerciseProperties.equipment.length > 0 ?
-                                <li>Equipment is {exerciseProperties.equipment.join(' or ')}</li> : ''
+                            selectedExerciseProp.difficulty.length > 0 ?
+                                <li>Difficulty is {selectedExerciseProp.difficulty.join(' or ')}</li> : ''
                         }
 
                         {
-                            exerciseProperties.exerciseType.length > 0 ?
-                                <li>Exercise type is {exerciseProperties.exerciseType.join(' or ')}</li> : ''
+                            selectedExerciseProp.equipment.length > 0 ?
+                                <li>Equipment is {selectedExerciseProp.equipment.join(' or ')}</li> : ''
                         }
 
                         {
-                            exerciseProperties.bodyPart.length > 0 ?
-                                <li>Body part is {exerciseProperties.bodyPart.join(' or ')}</li> : ''
+                            selectedExerciseProp.exerciseType.length > 0 ?
+                                <li>Exercise type is {selectedExerciseProp.exerciseType.join(' or ')}</li> : ''
                         }
 
                         {
-                            exerciseProperties.ageCategory !== '' ?
-                                <li>Age category is {exerciseProperties.ageCategory}</li> : ''
+                            selectedExerciseProp.bodyPart.length > 0 ?
+                                <li>Body part is {selectedExerciseProp.bodyPart.join(' or ')}</li> : ''
+                        }
+
+                        {
+                            selectedExerciseProp.ageCategory !== '' ?
+                                <li>Age category is {selectedExerciseProp.ageCategory}</li> : ''
                         }
 
 
                         {
-                            exerciseProperties.imageOrientation !== '' ?
-                                <li>Image orientation is {exerciseProperties.imageOrientation}</li> : ''
+                            selectedExerciseProp.imageOrientation !== '' ?
+                                <li>Image orientation is {selectedExerciseProp.imageOrientation}</li> : ''
                         }
 
                     </ul>
@@ -172,7 +167,7 @@ function Sidebar() {
                                 type='radio'
                                 value='C1-C4 Tetraplegia'
                                 name='condition'
-                                onChange={e => setExerciseProperties({ ...exerciseProperties, condition: e.target.value })}
+                                onChange={e => setSelectedExerciseProp({ ...selectedExerciseProp, condition: e.target.value })}
                             />
                             <label>C1-C4 Tetraplegia</label>
                         </div>
@@ -183,7 +178,7 @@ function Sidebar() {
                                 type='radio'
                                 value='C5 Tetraplegia'
                                 name='condition'
-                                onChange={e => setExerciseProperties({ ...exerciseProperties, condition: e.target.value })}
+                                onChange={e => setSelectedExerciseProp({ ...selectedExerciseProp, condition: e.target.value })}
                             />
                             <label>C5 Tetraplegia</label>
                         </div>
@@ -194,7 +189,7 @@ function Sidebar() {
                                 type='radio'
                                 value='C6 Tetraplegia'
                                 name='condition'
-                                onChange={e => setExerciseProperties({ ...exerciseProperties, condition: e.target.value })}
+                                onChange={e => setSelectedExerciseProp({ ...selectedExerciseProp, condition: e.target.value })}
                             />
                             <label>C6 Tetraplegia</label>
                         </div>
@@ -206,7 +201,7 @@ function Sidebar() {
                             type='radio'
                             value='Traumatic brain injury'
                             name='condition'
-                            onChange={e => setExerciseProperties({ ...exerciseProperties, condition: e.target.value })}
+                            onChange={e => setSelectedExerciseProp({ ...selectedExerciseProp, condition: e.target.value })}
                         />
                         <label>Traumatic brain injur</label>
                     </div>
@@ -215,9 +210,9 @@ function Sidebar() {
                     <div>
                         <input
                             type='radio'
-                            value='Stroke'
+                            value='Strok'
                             name='condition'
-                            onChange={e => setExerciseProperties({ ...exerciseProperties, condition: e.target.value })}
+                            onChange={e => setSelectedExerciseProp({ ...selectedExerciseProp, condition: e.target.value })}
                         />
                         <label>Strok</label>
                     </div>
@@ -227,7 +222,7 @@ function Sidebar() {
                             type='radio'
                             value='Motor delay'
                             name='condition'
-                            onChange={e => setExerciseProperties({ ...exerciseProperties, condition: e.target.value })}
+                            onChange={e => setSelectedExerciseProp({ ...selectedExerciseProp, condition: e.target.value })}
                         />
                         <label>Motor dela</label>
                     </div>
@@ -385,7 +380,7 @@ function Sidebar() {
                     <label>
                         <input
                             type='checkbox'
-                            value='Manipulating objects'
+                            value='Head/neck'
                             onChange={e => onClickUpdateBodyPart(e)}
                         />
                         Head/neck
@@ -394,7 +389,7 @@ function Sidebar() {
                     <label>
                         <input
                             type='checkbox'
-                            value='Manipulating objects'
+                            value='Shoulder/upper arm'
                             onChange={e => onClickUpdateBodyPart(e)}
                         />
                         Shoulder/upper arm
@@ -403,7 +398,7 @@ function Sidebar() {
                     <label>
                         <input
                             type='checkbox'
-                            value='Manipulating objects'
+                            value='Elbow/forearm'
                             onChange={e => onClickUpdateBodyPart(e)}
                         />
                         Elbow/forearm
@@ -430,7 +425,7 @@ function Sidebar() {
                             type='radio'
                             value='Infant/young child'
                             name='ageCategory'
-                            onChange={e => setExerciseProperties({ ...exerciseProperties, ageCategory: e.target.value })}
+                            onChange={e => setSelectedExerciseProp({ ...selectedExerciseProp, ageCategory: e.target.value })}
                         />
                         <label>Infant/young child</label>
                     </div>
@@ -440,7 +435,7 @@ function Sidebar() {
                             type='radio'
                             value='Child'
                             name='ageCategory'
-                            onChange={e => setExerciseProperties({ ...exerciseProperties, ageCategory: e.target.value })}
+                            onChange={e => setSelectedExerciseProp({ ...selectedExerciseProp, ageCategory: e.target.value })}
                         />
                         <label>Child</label>
                     </div>
@@ -450,7 +445,7 @@ function Sidebar() {
                             type='radio'
                             value='Adult'
                             name='ageCategory'
-                            onChange={e => setExerciseProperties({ ...exerciseProperties, ageCategory: e.target.value })}
+                            onChange={e => setSelectedExerciseProp({ ...selectedExerciseProp, ageCategory: e.target.value })}
                         />
                         <label>Adult</label>
                     </div>
@@ -460,7 +455,7 @@ function Sidebar() {
                             type='radio'
                             value='Senior'
                             name='ageCategory'
-                            onChange={e => setExerciseProperties({ ...exerciseProperties, ageCategory: e.target.value })}
+                            onChange={e => setSelectedExerciseProp({ ...selectedExerciseProp, ageCategory: e.target.value })}
                         />
                         <label>Senior</label>
                     </div>
@@ -487,7 +482,7 @@ function Sidebar() {
                             type='radio'
                             value='Not specified'
                             name='image-orientation'
-                            onChange={e => setExerciseProperties({ ...exerciseProperties, imageOrientation: e.target.value })}
+                            onChange={e => setSelectedExerciseProp({ ...selectedExerciseProp, imageOrientation: e.target.value })}
                         />
                         <label>Not specified</label>
                     </div>
@@ -497,7 +492,7 @@ function Sidebar() {
                             type='radio'
                             value='Left specified'
                             name='image-orientation'
-                            onChange={e => setExerciseProperties({ ...exerciseProperties, imageOrientation: e.target.value })}
+                            onChange={e => setSelectedExerciseProp({ ...selectedExerciseProp, imageOrientation: e.target.value })}
                         />
                         <label>Left specified</label>
                     </div>
@@ -507,7 +502,7 @@ function Sidebar() {
                             type='radio'
                             value='Right specified'
                             name='image-orientation'
-                            onChange={e => setExerciseProperties({ ...exerciseProperties, imageOrientation: e.target.value })}
+                            onChange={e => setSelectedExerciseProp({ ...selectedExerciseProp, imageOrientation: e.target.value })}
                         />
                         <label>Right specified</label>
                     </div>

@@ -5,15 +5,24 @@ import StoreContext from './components/store/StoreContext';
 
 function App() {
 
-  const [filteredImages, setFilteredImages] = useState(null);
+  const [selectedExerciseProp, setSelectedExerciseProp] = useState({
+      searchText: '',
+      condition: '',
+      ageCategory: '',
+      difficulty: [],
+      imageOrientation: '',
+      equipment: [],
+      exerciseType: [],
+      bodyPart: []
+  });
 
   useEffect(() => {
-    console.log(filteredImages);
-  }, [filteredImages]);
+    console.log(selectedExerciseProp);
+  }, [selectedExerciseProp]);
 
   return (
     <>
-      <StoreContext.Provider value={[filteredImages, setFilteredImages]}>
+      <StoreContext.Provider value={[selectedExerciseProp, setSelectedExerciseProp]}>
         <Home />
       </StoreContext.Provider>
     </>
@@ -21,3 +30,4 @@ function App() {
 }
 
 export default App;
+ 
